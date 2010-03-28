@@ -1,0 +1,9 @@
+## Interface: 30300
+## Title: kBags
+## Author: Kryso 
+## Dependencies: kCore, kWidgets, kEvents, Tukui, Tukui_Heal_Layout
+
+BagIcon.lua
+BagCategoryFrame.lua
+BagFrame.lua
+kBags.lua
