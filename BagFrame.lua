@@ -11,6 +11,26 @@ local BagCategoryFrame = Internals.BagCategoryFrame;
 -- **** private ****
 local Base;
 
+local GetContainerItemType = function( self, container, slot )
+	local itemType, subType, isEmpty;
+	local id = GetContainerItemID( container, slot );
+	
+	if ( not id ) then
+		id = GetInventoryItemID( "player", container > NUM_BAG_SLOTS and 39 + slot or 19 + slot );
+		
+		if ( not id ) then return; end	
+		
+		-- itemType here is in fact subType, but we want it to be returned as second argument
+		_, _, _, _, _, _, itemType, _, _, _, _ = GetItemInfo( id );
+		
+		isEmpty = true;
+	else
+		_, _, _, _, _, itemType, subType, _, _, _, _ = GetItemInfo( id ); 
+	end
+	
+	return id, itemType, subType, isEmpty;
+end
+
 -- **** event handlers ****
 local OnBagUpdate = function( self, container )
 	if ( ( container >= self.minContainer and container <= self.maxContainer ) or self.additionalContainer == container ) then
@@ -69,23 +89,29 @@ local ScanContainer = function( self, container )
 
 	for slot = 1, GetContainerNumSlots( container ) do
 		local category = defaultCategory;
-		local isEmpty = false;
 		
-		for _, c in ipairs( categories ) do
-			local result;
-			
-			result, isEmpty = c:CheckFilter( container, slot, false );
-			if ( result ) then
-				category = c;
-				break;
-			end
-		end
-
-		if ( not isEmpty and category == defaultCategory ) then
-			for _, c in ipairs( categories ) do
-				if ( c:CheckFilter( container, slot, true ) ) then
-					category = c;
+		local id, itemType, subType, isEmpty = GetContainerItemType( self, container, slot );
+		if ( isEmpty ) then
+			for _, value in ipairs( categories ) do
+				if ( value:CheckEmpty( itemType ) ) then
+					category = value;
 					break;
+				end
+			end
+		else
+			for _, value in ipairs( categories ) do
+				if ( value:CheckId( id ) ) then
+					category = value;
+					break;
+				end
+			end
+			
+			if ( category == defaultCategory ) then
+				for _, value in ipairs( categories ) do
+					if ( value:CheckType( itemType, subType ) ) then
+						category = value;
+						break;
+					end
 				end
 			end
 		end

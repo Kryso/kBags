@@ -10,14 +10,14 @@ local BagIcon = Internals.BagIcon;
 -- **** private ****
 local Base;
 
-Int16 = function( value )
+local Int16 = function( value )
 	local sign = value < 0 and 0x8000 or 0;
 	local body = bit.band( sign > 0 and -value or value, 0x7fff );
 	
 	return bit.bor( body, sign );
 end
 
-Int32 = function( value )
+local Int32 = function( value )
 	local body = bit.band( value, 0x7fff );
 	local sign = bit.band( value, 0x8000 );
 
@@ -83,42 +83,45 @@ local Add = function( self, container, slot )
 	tinsert( self.slots, Compress( self, container, slot ) );
 end
 
-local CheckFilter = function( self, container, slot, byCategory )
+local CheckId = function( self, id )
 	local filter = self.filter;
 	if ( not filter ) then return false; end	
 	
-	local id = GetContainerItemID( container, slot );
-	if ( not id ) then
-		if ( container == -1 ) then return; end
-		
-		local bag = "Bag" .. tostring( container ) .. ( container > NUM_BAG_SLOTS and "" or "Slot" );
-		local id = GetInventoryItemID( "player", GetInventorySlotInfo( bag ) );
-		local _, _, _, _, _, _, itemSubType, _, _, _, _ = GetItemInfo( id ); 
-	
-		local type = "empty->" .. itemSubType;
-		for _, v in ipairs( filter ) do
-			if ( v == type ) then
-				return true;
-			end
+	for _, value in ipairs( filter ) do
+		if ( value == id ) then
+			return true;
 		end
-	
-		return false, true; 
 	end
-	local _, _, _, _, _, itemType, itemSubType, _, _, _, _ = GetItemInfo( id ); 
+	
+	return false;
+end
 
-	if ( byCategory ) then
-		for _, v in ipairs( filter ) do
-			if ( v == itemType or v == itemSubType or v == ( tostring( itemType ) .. "->" .. tostring( itemSubType ) ) ) then
-				return true;
-			end
+local CheckType = function( self, itemType, subType )
+	local filter = self.filter;
+	if ( not filter ) then return false; end	
+	
+	local fullType = tostring( itemType ) .. "->" .. tostring( subType );
+	
+	for _, value in ipairs( filter ) do
+		if ( value == fullType or value == itemType ) then
+			return true;
 		end
-	else
-		for _, v in ipairs( filter ) do
-			if ( v == id  ) then
-				return true;
-			end
+	end
+	
+	return false;	
+end
+
+local CheckEmpty = function( self, bagType )
+	local filter = self.filter;
+	if ( not filter ) then return false; end	
+	
+	local emptyType = "empty->" .. bagType;
+	
+	for _, value in ipairs( filter ) do
+		if ( value == emptyType ) then
+			return true;
 		end
-	end	
+	end
 	
 	return false;
 end
@@ -203,10 +206,14 @@ end
 -- **** main ****
 Internals.BagCategoryFrame, Base = kCore.CreateClass( ctor, { 
 		Add = Add,
-		CheckFilter = CheckFilter,
 		Reset = Reset,
 		Update = Update,
 		Render = Render,
+
+		-- filtering
+		CheckId = CheckId,
+		CheckType = CheckType,
+		CheckEmpty = CheckEmpty,
 		
 		-- positioning
 		GetMaxHeight = GetMaxHeight,

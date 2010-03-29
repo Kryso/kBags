@@ -2,7 +2,10 @@ local _, Internals = ...;
 
 -- **** defines ****
 local CATEGORIES = {
-		{ "Quest" },
+		{ 
+			"Quest",
+			44987, -- Valiant's Seal
+		},
 		{ -- Heirloom items
 			42943, -- Bloodied Arcanite Reaper
 			42944, -- Balanced Heartseeker
@@ -38,9 +41,9 @@ local CATEGORIES = {
 			48691, -- Tattered Dreadmist Robe
 			50255, -- Dread Pirate Ring
 		},
-		{ "Reagent" },
+		{ "Miscellaneous->Reagent" },
 		{ "Consumable" },
-		{ "Meat" },
+		{ "Trade Goods->Meat" },
 		{
 			"Fishing Poles",
 			33820, -- Weather-Beaten Fishing Hat
@@ -49,30 +52,36 @@ local CATEGORIES = {
 		},
 		{ "Trade Goods->Other" },
 		{ 
-			"Devices",
+			"Trade Goods->Devices",
+			"Trade Goods->Explosives",
+			"Recipe->Engineering",
 			48933, -- Wormhole generator
 		},
-		{ "Parts" },
+		{ "Trade Goods->Parts" },
 		{ 
-			"Metal & Stone",
+			"Trade Goods->Metal & Stone",
 			"empty->Mining Bag",
 		},
 		{ "Trade Goods->Cloth" },
 		{ 
-			"Herb",
+			"Trade Goods->Herb",
 			"empty->Herb Bag",
 		},
 		{ 
 			"Gem",
 			"empty->Gem Bag",
 		},
-		{
-			"Elemental",
-		},
+		{ "Trade Goods->Elemental" },
 		{ 
-			"Enchanting", 
+			"Trade Goods->Enchanting", 
+			"Recipe->Enchanting",
 			"empty->Enchanting Bag",
 			34055, -- Greater Cosmic Essence 
+		},
+		{
+			"empty->Ammo Pouch",
+			"empty->Quiver",
+			"Projectile",
 		},
 		{
 			"empty->Soul Bag",
@@ -135,10 +144,12 @@ bagToggleFrame:SetAttribute( "_onshow", [[
 		else
 			kBag:SetPoint( "BOTTOMRIGHT", MultiBarLeftButton12, "BOTTOMLEFT", -19, -8 );
 		end
+		
 		kBag:Show();
 	]] );
 bagToggleFrame:SetAttribute( "_onhide", [[
 		BankFrame:Hide();
+		
 		kBag:Hide();
 	]] );
 	
