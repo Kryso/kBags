@@ -5,6 +5,8 @@ local CATEGORIES = {
 		{ 
 			"Quest",
 			44987, -- Valiant's Seal
+			39878, -- Mysterious Egg
+			44717, -- Disgusting Jar
 		},
 		{ -- Heirloom items
 			42943, -- Bloodied Arcanite Reaper
@@ -45,7 +47,7 @@ local CATEGORIES = {
 		{ "Consumable" },
 		{ "Trade Goods->Meat" },
 		{
-			"Fishing Poles",
+			"Weapon->Fishing Poles",
 			33820, -- Weather-Beaten Fishing Hat
 			46006, -- Glow Worm
 			34861, -- Sharpened Fish Hook

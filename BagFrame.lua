@@ -16,7 +16,9 @@ local GetContainerItemType = function( self, container, slot )
 	local id = GetContainerItemID( container, slot );
 	
 	if ( not id ) then
-		id = GetInventoryItemID( "player", container > NUM_BAG_SLOTS and 39 + slot or 19 + slot );
+		if ( container <= 0 ) then return; end
+		
+		id = GetInventoryItemID( "player", ContainerIDToInventoryID( container ) );
 		
 		if ( not id ) then return; end	
 		
