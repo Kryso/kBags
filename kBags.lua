@@ -92,7 +92,11 @@ local CATEGORIES = {
 	};
 
 -- **** imports ****
+local kWidgets = kWidgets;
+
 local BagFrame = Internals.BagFrame;
+
+local Scale = kWidgets.Scale;
 
 -- **** main ****
 
@@ -130,6 +134,10 @@ UIPanelWindows[ "BankFrame" ] = nil;
 -- create secure openers - this is just temporary workaround until I implement creating templated frames through kWidgets
 bagToggleFrame = CreateFrame( "Frame", nil, UIParent, "SecureHandlerShowHideTemplate" );
 bagToggleFrame:SetParent( ContainerFrame1 );
+
+bagFrame:MakeRaw();
+bankFrame:MakeRaw();
+
 bagToggleFrame:SetFrameRef( "BankFrame", BankFrame );
 bagToggleFrame:SetFrameRef( "kBag", bagFrame );
 bagToggleFrame:SetFrameRef( "PetActionButton10", PetActionButton10 );
@@ -139,12 +147,13 @@ bagToggleFrame:Execute( [[
 		BankFrame = self:GetFrameRef( "BankFrame" );
 		PetActionButton10 = self:GetFrameRef( "PetActionButton10" );
 		MultiBarLeftButton12 = self:GetFrameRef( "MultiBarLeftButton12" );
-	]] );
+	]] );	
+	
 bagToggleFrame:SetAttribute( "_onshow", [[
 		if ( PetActionButton10:IsShown() ) then
-			kBag:SetPoint( "BOTTOMRIGHT", PetActionButton10, "BOTTOMLEFT", -19, -6 );
+			kBag:SetPoint( "BOTTOMRIGHT", PetActionButton10, "BOTTOMLEFT", ]] .. Scale( -10 ) .. [[, ]] .. Scale( -5 ) .. [[ );
 		else
-			kBag:SetPoint( "BOTTOMRIGHT", MultiBarLeftButton12, "BOTTOMLEFT", -19, -8 );
+			kBag:SetPoint( "BOTTOMRIGHT", MultiBarLeftButton12, "BOTTOMLEFT", ]] .. Scale( -10 ) .. [[, ]] .. Scale( -5 ) .. [[ );
 		end
 		
 		kBag:Show();
@@ -171,3 +180,6 @@ bankToggleFrame:SetAttribute( "_onhide", [[
 		ContainerFrame1:Hide();		
 		kBank:Hide();
 	]] );
+	
+bagFrame:Restore();
+bankFrame:Restore();
