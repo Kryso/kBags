@@ -6,7 +6,7 @@ local kWidgets = kWidgets;
 
 local AuraIcon = kWidgets.AuraIcon;
 
-local SecureActionButtonTemplate = kCore.CreateClass( function( self ) end, { }, function( self )
+local SecureActionButtonTemplate = kCore.CreateClass( function( self ) end, nil, function( self )
 	local result = CreateFrame( "Button", nil, UIParent, "SecureActionButtonTemplate" );
 	
 	if ( not self.initialized ) then
@@ -31,47 +31,10 @@ end
 -- **** frame script handlers ****
 local OnEnter = function( button, motion )
 	local self = button:GetParent();
-
-	local container = self.container;
-	local slot = self.slot;
-		
+	
 	self:SetBorderSize( 2 );
 	
-	if ( self:GetRight() >= ( GetScreenWidth() / 2 ) ) then
-		GameTooltip:SetOwner( self, "ANCHOR_LEFT" );
-	else
-		GameTooltip:SetOwner( self, "ANCHOR_RIGHT" );
-	end
-	
-	if ( container == -1 ) then
-		GameTooltip:SetInventoryItem( "player", BankButtonIDToInvSlotID( slot ) );
-	else
-		local _, repairCost = GameTooltip:SetBagItem( container, slot );
-		if ( InRepairMode() and ( repairCost and repairCost > 0 ) ) then
-			GameTooltip:AddLine( REPAIR_COST, "", 1, 1, 1 );
-			SetTooltipMoney( GameTooltip, repairCost );
-		end
-	end
-
-	if ( IsModifiedClick( "DRESSUP" ) and self.hasItem ) then
-		ShowInspectCursor();
-	elseif ( MerchantFrame:IsShown() and MerchantFrame.selectedTab == 1 ) then
-		ShowContainerSellCursor( container, slot );
-	elseif ( self.readable ) then
-		ShowInspectCursor();
-	else
-		ResetCursor();
-	end
-	
-	local additionalInfo = "Slot: " .. tostring( container ) .. " / " .. tostring( slot ) .. " "
-	local id = GetContainerItemID( container, slot );
-	if ( id ) then
-		local _, _, _, _, _, itemType, itemSubType, _, _, _, _ = GetItemInfo( id );
-		additionalInfo = additionalInfo .. "Id: " .. tostring( id ) .. " Type: " .. tostring( itemType ) .. " / " .. tostring( itemSubType );
-	end
-	GameTooltip:AddLine( additionalInfo, "", 1, 1, 1 );
-	
-	GameTooltip:Show();
+	self:UpdateTooltip();
 end
 
 local OnLeave = function( button, motion )
@@ -97,6 +60,7 @@ end
 
 local OnMouseUp = function( button, clickedButton )
 	local self = button:GetParent();
+	
 	local container = self.container;
 	local slot = self.slot;
 
@@ -137,8 +101,8 @@ local Update = function( self )
 	local container = self.container;
 	local slot = self.slot;
 	
-	local texture, count, locked, quality, readable, lootable, link = GetContainerItemInfo( container, slot );
-	local start, duration, enable = GetContainerItemCooldown( container, slot );
+	local texture, count, locked, _, readable, _, link = GetContainerItemInfo( container, slot );
+	local start, duration, _ = GetContainerItemCooldown( container, slot );
 	local name, _, rarity, _, _, itemType, itemSubType, _, _, _, _;
 	if ( link ) then
 		name, _, rarity, _, _, itemType, itemSubType, _, _, _, _ = GetItemInfo( link );
@@ -156,6 +120,47 @@ local Update = function( self )
 	end
 	self.readable = readable;
 	self.hasItem = texture and true or false;	
+end
+
+local UpdateTooltip = function( self )
+	local container = self.container;
+	local slot = self.slot;
+	
+	if ( self:GetRight() >= ( GetScreenWidth() / 2 ) ) then
+		GameTooltip:SetOwner( self, "ANCHOR_LEFT" );
+	else
+		GameTooltip:SetOwner( self, "ANCHOR_RIGHT" );
+	end
+	
+	if ( container == -1 ) then
+		GameTooltip:SetInventoryItem( "player", BankButtonIDToInvSlotID( slot ) );
+	else
+		local _, repairCost = GameTooltip:SetBagItem( container, slot );
+		if ( InRepairMode() and repairCost and repairCost > 0 ) then
+			GameTooltip:AddLine( REPAIR_COST, "", 1, 1, 1 );
+			SetTooltipMoney( GameTooltip, repairCost );
+		end
+	end
+
+	if ( IsModifiedClick( "DRESSUP" ) and self.hasItem ) then
+		ShowInspectCursor();
+	elseif ( MerchantFrame:IsShown() and MerchantFrame.selectedTab == 1 ) then
+		ShowContainerSellCursor( container, slot );
+	elseif ( self.readable ) then
+		ShowInspectCursor();
+	else
+		ResetCursor();
+	end
+	
+	local additionalInfo = "Slot: " .. tostring( container ) .. " / " .. tostring( slot ) .. " "
+	local id = GetContainerItemID( container, slot );
+	if ( id ) then
+		local _, _, _, _, _, itemType, itemSubType, _, _, _, _ = GetItemInfo( id );
+		additionalInfo = additionalInfo .. "Id: " .. tostring( id ) .. " Type: " .. tostring( itemType ) .. " / " .. tostring( itemSubType );
+	end
+	GameTooltip:AddLine( additionalInfo, "", 1, 1, 1 );
+	
+	GameTooltip:Show();
 end
 
 -- **** ctor ****
@@ -191,4 +196,5 @@ Internals.BagIcon, Base = kCore.CreateClass( ctor, {
 		Get = Get,
 		Set = Set,
 		Update = Update,
+		UpdateTooltip = UpdateTooltip,
 	}, AuraIcon );
