@@ -42,6 +42,7 @@ local CATEGORIES = {
 			48689, -- Stained Shadowcraft Tunic
 			48691, -- Tattered Dreadmist Robe
 			50255, -- Dread Pirate Ring
+			42945, -- Venerable Dal'Rend's Sacred Charge
 		},
 		{ "Miscellaneous->Reagent" },
 		{ "Consumable" },
